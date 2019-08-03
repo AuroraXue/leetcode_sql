@@ -1,3 +1,5 @@
+--Oracle
+
 select max(salary) as SecondHighestSalary
 from Employee
 where salary <>
@@ -7,5 +9,5 @@ where salary <>
 Key point to remember:
 Say if there is not data or max(salary) for second high salary,
 the value return is natually NULL! No need to write case when
-statment. 
+statment.
 ```

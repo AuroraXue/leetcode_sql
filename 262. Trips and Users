@@ -1,0 +1,132 @@
+/* Write your T-SQL query statement below */
+
+select Request_at as Day,
+round(sum(cal_noban_ind)/count(*),2) as `Cancellation Rate`
+from(
+select *,
+case
+  when Status = 'cancelled_by_driver' and driver_banned = 'No' then 1
+  when Status = 'cancelled_by_client' and client_banned = 'No' then 1
+  else 0
+end as cal_noban_ind
+from(
+select a.*, b.Banned as client_banned,
+c.Banned as driver_banned
+from Trips a
+left join Users b
+on a.Client_id = b.Users_id
+and b.Role = 'CLIENT'
+left join Users c
+on a.Driver_Id = c.Users_Id
+and c.Role = 'Driver') d) e
+where client_banned = 'No'
+group by Day;
+
+
+Trips:
+["Id", "Client_Id", "Driver_Id", "City_Id", "Status", "Request_at"],
+[["1", "1", "10", "1", "completed", "2013-10-01"],
+ ["2", "2", "11", "1", "cancelled_by_driver", "2013-10-01"],
+ ["3", "3", "12", "6", "completed", "2013-10-01"],
+ ["4", "4", "13", "6", "cancelled_by_client", "2013-10-01"],
+ ["5", "1", "10", "1", "completed", "2013-10-02"],
+ ["6", "2", "11", "6", "completed", "2013-10-02"],
+ ["7", "3", "12", "6", "completed", "2013-10-02"],
+ ["8", "2", "12", "12", "completed", "2013-10-03"],
+ ["9", "3", "10", "12", "completed", "2013-10-03"],
+ ["10", "4", "13", "12", "cancelled_by_driver", "2013-10-03"]]
+
+
+"Users":
+["Users_Id", "Banned", "Role"],
+[["1", "No", "client"],
+["2", "Yes", "client"],
+["3", "No", "client"],
+["4", "No", "client"],
+["10", "No", "driver"],
+["11", "No", "driver"],
+["12", "No", "driver"],
+["13", "No", "driver"]]
+
+-- first left join with where a.Client_Id = b.Users_Id and b.Role = 'driver'
+["Id","Client_Id","Driver_Id","City_Id","Status","Request_at","client_banned"]
+[[1,1,10,1,"completed","2013-10-01","No"],
+[2,2,11,1,"cancelled_by_driver","2013-10-01","Yes"],
+[3,3,12,6,"completed","2013-10-01","No"],
+[4,4,13,6,"cancelled_by_client","2013-10-01","No"],
+[5,1,10,1,"completed","2013-10-02","No"],
+[6,2,11,6,"completed","2013-10-02","Yes"],
+[7,3,12,6,"completed","2013-10-02","No"],
+[8,2,12,12,"completed","2013-10-03","Yes"],
+[9,3,10,12,"completed","2013-10-03","No"],
+[10,4,13,12,"cancelled_by_driver","2013-10-03","No"]]}
+
+--
+/*left join Users b
+on a.Client_id = b.Users_id
+and b.Role = 'CLIENT'
+left join Users c
+on a.Driver_Id = c.Users_Id
+and c.Role = 'Driver';*/
+
+["Id","Client_Id","Driver_Id","City_Id","Status","Request_at","client_banned","driver_banned"]
+[[1,1,10,1,"completed","2013-10-01","No","No"],
+[2,2,11,1,"cancelled_by_driver","2013-10-01","Yes","No"],
+[3,3,12,6,"completed","2013-10-01","No","No"],
+[4,4,13,6,"cancelled_by_client","2013-10-01","No","No"],
+[5,1,10,1,"completed","2013-10-02","No","No"],
+[6,2,11,6,"completed","2013-10-02","Yes","No"],
+[7,3,12,6,"completed","2013-10-02","No","No"],
+[8,2,12,12,"completed","2013-10-03","Yes","No"],
+[9,3,10,12,"completed","2013-10-03","No","No"],
+[10,4,13,12,"cancelled_by_driver","2013-10-03","No","No"]]}
+
+
+
+-- case when
+["Id","Client_Id","Driver_Id","City_Id","Status","Request_at","client_banned","driver_banned","cal_noban_ind"],
+[[1,1,10,1,"completed","2013-10-01","No","No",0],
+[5,1,10,1,"completed","2013-10-02","No","No",0],
+[9,3,10,12,"completed","2013-10-03","No","No",0],
+[2,2,11,1,"cancelled_by_driver","2013-10-01","Yes","No",1],
+[6,2,11,6,"completed","2013-10-02","Yes","No",0],
+[8,2,12,12,"completed","2013-10-03","Yes","No",0],
+[3,3,12,6,"completed","2013-10-01","No","No",0],
+[7,3,12,6,"completed","2013-10-02","No","No",0],
+[4,4,13,6,"cancelled_by_client","2013-10-01","No","No",1],
+[10,4,13,12,"cancelled_by_driver","2013-10-03","No","No",1]]
+
+
+-------------------------special case did not pass -----------------------
+"Trips":
+["Id", "Client_Id", "Driver_Id", "City_Id", "Status", "Request_at"],
+[["1", "1", "10", "1", "cancelled_by_client", "2013-10-04"]]
+"Users": ["Users_Id", "Banned", "Role"]}
+[["1", "No", "client"],
+["10", "No", "driver"]
+
+--the date bound
+-- accepted one
+select Request_at as Day,
+round(sum(cal_noban_ind)/count(*),2) as `Cancellation Rate`
+from(
+select *,
+case
+  when Status = 'cancelled_by_driver' and driver_banned = 'No' then 1
+  when Status = 'cancelled_by_client' and client_banned = 'No' then 1
+  else 0
+end as cal_noban_ind
+from(
+select a.*, b.Banned as client_banned,
+c.Banned as driver_banned
+from Trips a
+left join Users b
+on a.Client_id = b.Users_id
+and b.Role = 'CLIENT'
+left join Users c
+on a.Driver_Id = c.Users_Id
+and c.Role = 'Driver') d) e
+where client_banned = 'No'
+and Request_at >= '2013-10-01'
+and Request_at<= '2013-10-03'
+group by Request_at;
