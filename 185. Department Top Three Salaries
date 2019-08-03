@@ -1,0 +1,13 @@
+/* Write your T-SQL query statement below */
+
+
+select Department, Name as Employee, Salary
+from(
+select a.Name, a.Salary, a.DepartmentId,
+b.Name as Department,
+dense_rank() over(partition by a.DepartmentId order by a.salary desc) as dr
+from Employee a
+left join Department b
+on a.DepartmentId = b.Id) c
+where Department is not null
+and dr <= 3;
