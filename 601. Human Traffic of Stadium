@@ -12,3 +12,5 @@ from stadium) a
 where (people >= 100 and people1>=100 and people2>=100)
 or (people>=100 and people1>=100 and people3>=100)
 or (people>=100 and people3>=100 and people4>=100);
+
+-- pay attention to () for calcualtion order!
