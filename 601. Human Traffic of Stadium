@@ -1,0 +1,14 @@
+/* Write your T-SQL query statement below */
+
+
+select id, visit_date, people
+from(
+select *,
+lead(people, 1) over(order by id) as people1,
+lead(people, 2) over(order by id) as people2,
+lag(people,1) over(order by id) as people3,
+lag(people,2) over(order by id) as people4
+from stadium) a
+where (people >= 100 and people1>=100 and people2>=100)
+or (people>=100 and people1>=100 and people3>=100)
+or (people>=100 and people3>=100 and people4>=100);
