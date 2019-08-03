@@ -1,0 +1,14 @@
+-- not support window funciton
+
+select Id, Email
+from(
+select *, rank() over(partition by Email Order by Id) as rk
+from Person)
+where rk = 1;
+
+delete a from Person a
+inner join Person b
+where a.email = b.email and a.id > b.id;
+
+
+--delete from where

@@ -1,0 +1,28 @@
+/* Write your T-SQL query statement below */
+
+
+select Department, Name as Employee, Salary
+from(
+select Department, Name, Salary,
+rank() over(Partition by c.Department
+                   order by c.Salary desc) as rk
+from(
+select a.*, b.Name as Department from Employee a
+left join Department b
+on a.DepartmentId = b.Id)c where Department is not null)
+where rk =1
+;
+
+-- seems having can not be put into having
+
+-- Other way
+-- MS SQL Server: 2 select 
+select Department, Name as Employee, Salary
+from(
+select a.Name, a.Salary, a.DepartmentId, b.Name as Department,
+rank() over(partition by a.DepartmentId order by a.Salary DESC) as rk
+from Employee a
+left join Department b
+on a.DepartmentId = b.Id) c
+where Department is not null
+and rk =1;

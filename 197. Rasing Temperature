@@ -1,0 +1,8 @@
+-- Pay attetntion that date is not coutinuous
+
+select id
+from(
+SELECT a.*, b.Temperature as yest_temp from weather a
+left join weather b
+on a.RecordDate = dateadd(day, 1, b.RecordDate))c
+where yest_temp < Temperature;
