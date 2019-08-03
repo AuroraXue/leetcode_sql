@@ -1,0 +1,19 @@
+-- Oracle
+
+
+select Name as Employee
+from(
+select a.*, b.Salary as manager_salary
+from Employee a
+inner join Employee b
+on a.ManagerId = b.Id)
+where manager_salary is not null
+and Salary > manager_salary;
+
+select Name as Employee
+from(
+select a.*, b.Salary as manager_salary
+from Employee a
+inner join Employee b
+on a.ManagerId = b.Id)
+where Salary > manager_salary;

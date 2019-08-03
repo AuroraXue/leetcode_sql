@@ -1,0 +1,70 @@
+-- Learn something about function in Oracle
+```
+CREATE FUNCTION getNthHighestSalary(N IN NUMBER) RETURN NUMBER IS
+result NUMBER;
+BEGIN
+      select distinct Salary
+      into result
+      from(
+      select Salary,
+      rank() over(order by Salary DESC) as rk
+      from
+      Employee)
+      where rk = N;
+      RETURN result;
+END;
+```
+
+CREATE FUNCTION getNthHighestSalary(N IN NUMBER) RETURN NUMBER IS
+result NUMBER;
+BEGIN
+    SELECT salary into result
+        from (select distinct salary,
+        DENSE_RANK() OVER ( ORDER BY salary DESC NULLS
+        LAST) DENSE_RANK
+        FROM employee)
+        where DENSE_RANK = n ;
+
+    RETURN result;
+END;
+
+--My Answer:
+CREATE FUNCTION getNthHighestSalary(N IN NUMBER) RETURN NUMBER IS
+result NUMBER;
+BEGIN
+      select distinct Salary
+      into result
+      from(
+      select Salary,
+      dense_rank() over(order by Salary DESC) as rk
+      from
+      Employee)t
+      where rk = N;
+      RETURN result;
+END;
+
+```
+Explaination
+First is about DENSE_RANK and rank and row_number()
+rank() will return something like 1,1,1,4,4,5
+dense_rank() will return something like 1,1,1,2,2,3
+row_number() will return 1,2,3,4,5,6
+
+here we use dense_rank() since we need to contious NUMBER
+
+Second thing is about distinct,
+it is possible that after we do rank(), there are muiltiple rows
+will have the same rank() result, so we need to add distinct!
+at the select statement, make sure only return one row
+
+Third thing is about ORDER BY salary DESC NULLS LAST
+here NULL LAST means that if the ordered columns include null,
+how to order NULL value. Other value:
+NULL LAST, NULL FIRST
+
+The last thing is about function in Oracle:
+pay attetion to the select ... into ; and return style
+
+
+
+```

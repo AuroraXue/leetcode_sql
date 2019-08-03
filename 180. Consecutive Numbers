@@ -1,0 +1,21 @@
+/* Write your PL/SQL query statement below */
+
+select distinct Num as ConsecutiveNums from
+(select a.*, b.Num as num2, c.Num as num3
+from Logs a
+left join Logs b
+on a.Id = b.Id+1
+left join Logs c
+on a.Id = c.Id+2)
+where Num = num2
+and num2 = num3;
+
+-- Explaination:
+```do three times of left join, performance not good.```
+-- other people use lead, which i do not know:
+
+"""select distinct num as ConsecutiveNums from (
+select num,lead(num,1)over(order by id) as sec,lead(num,2)over(order by id)  as thd from logs) a where num = sec and num = thd"""
+
+-- lead means move one cell up, lead(colums_name, num_of_cell to move_up) over(order by <order>)
+-- the smae as lag(), but lag do shift one cell below, lag(columns_nume, num_of_cell_to_move_down) over (order by <order>)
