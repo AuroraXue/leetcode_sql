@@ -1,0 +1,14 @@
+/* Write your T-SQL query statement below */
+
+
+select id,
+case
+  when (id % 2) <> 0 and student1 is not null then student1
+  when (id % 2) <> 0 and student1 is null then student
+  when (id % 2) = 0 then student2
+end as student
+from(
+select *,
+lead(student, 1) over(order by id) as student1,
+lag(student, 1) over(order by id) as student2
+from seat) c;
